@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+
+  <meta
+    name="description"
+    content="Blocks by Khakimov — 8x8 blok puzzle o‘yini."
+  />
+
+  <meta name="theme-color" content="#101426" />
+
+  <title>Blocks by Khakimov</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <main class="game-app" id="gameApp">
+
+    <!-- Header -->
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">
+          <span class="logo-square logo-square--purple"></span>
+          <span class="logo-square logo-square--yellow"></span>
+          <span class="logo-square logo-square--green"></span>
+          <span class="logo-square logo-square--pink"></span>
+        </div>
+
+        <div class="brand-content">
+          <h1 class="brand-title">BLOCKS</h1>
+          <p class="brand-author">by Khakimov</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button
+          class="icon-button"
+          id="soundButton"
+          type="button"
+          aria-label="Ovozni yoqish yoki o‘chirish"
+        >
+          <span id="soundIcon">🔊</span>
+        </button>
+
+        <button
+          class="icon-button"
+          id="themeButton"
+          type="button"
+          aria-label="Rang mavzusini almashtirish"
+        >
+          <span id="themeIcon">☾</span>
+        </button>
+
+        <button
+          class="icon-button"
+          id="pauseButton"
+          type="button"
+          aria-label="O‘yinni pauza qilish"
+        >
+          <span>Ⅱ</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Score panel -->
+    <section class="score-panel" aria-label="O‘yin statistikasi">
+      <div class="score-card">
+        <span class="score-label">BALL</span>
+        <strong id="scoreValue">0</strong>
+      </div>
+
+      <div class="score-card score-card--main">
+        <span class="score-label">REKORD</span>
+        <strong id="bestScoreValue">0</strong>
+      </div>
+
+      <div class="score-card">
+        <span class="score-label">COMBO</span>
+        <strong id="comboValue">0</strong>
+      </div>
+    </section>
+
+    <!-- Main game -->
+    <section class="game-card">
+
+      <div class="game-heading">
+        <div>
+          <span class="game-kicker">PUZZLE MODE</span>
+          <h2 class="game-title">Maydonni to‘ldir</h2>
+        </div>
+
+        <div class="level-badge">
+          <span>LEVEL</span>
+          <strong id="levelValue">1</strong>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-area">
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            id="progressFill"
+            style="width: 0%;"
+          ></div>
+        </div>
+
+        <span id="progressText">
+          Keyingi bosqichgacha: 100 ball
+        </span>
+      </div>
+
+      <!-- 8x8 board -->
+      <div
+        class="board-wrapper"
+        id="boardWrapper"
+        aria-label="8x8 o‘yin maydoni"
+      >
+        <div
+          class="game-board"
+          id="gameBoard"
+          role="grid"
+          aria-label="8x8 blok maydoni"
+          tabindex="0"
+        >
+          <!--
+            JavaScript bu yerga 64 ta katak yaratadi.
+
+            Har bir katak quyidagicha bo‘ladi:
+            <div
+              class="board-cell"
+              data-row="0"
+              data-column="0"
+              role="gridcell"
+            ></div>
+          -->
+        </div>
+
+        <!-- Sudralayotgan shakl uchun preview -->
+        <div
+          class="board-preview"
+          id="boardPreview"
+          aria-hidden="true"
+        ></div>
+      </div>
+
+      <!-- Tanlangan shakl haqida ma’lumot -->
+      <div class="drag-status" id="dragStatus">
+        <span class="status-indicator"></span>
+        <span id="dragStatusText">
+          Shaklni bosib ushlab, maydonga olib boring
+        </span>
+      </div>
+
+      <!-- Pieces -->
+      <section class="pieces-section" aria-label="Bloklar">
+        <div class="pieces-heading">
+          <div>
+            <span class="section-kicker">AVAILABLE</span>
+            <h3>Blokni tanlang</h3>
+          </div>
+
+          <span id="piecesLeftText">3 ta blok</span>
+        </div>
+
+        <div
+          class="pieces-container"
+          id="piecesContainer"
+          aria-label="Sudraladigan bloklar"
+        >
+          <!--
+            JavaScript bu yerga 3 ta shakl yaratadi.
+
+            Har bir shakl taxminan quyidagicha bo‘ladi:
+
+            <div
+              class="piece-slot"
+              data-piece-index="0"
+              draggable="true"
+              role="button"
+              tabindex="0"
+              aria-label="Blok 1"
+            >
+              <div class="piece-shape">
+                <span class="piece-block"></span>
+                <span class="piece-block"></span>
+              </div>
+            </div>
+
+            JavaScript quyidagi eventlarni boshqaradi:
+            - pointerdown
+            - pointermove
+            - pointerup
+            - dragstart
+            - dragend
+            - touchstart
+            - touchmove
+            - touchend
+          -->
+        </div>
+      </section>
+
+      <!-- Game actions -->
+      <div class="game-actions">
+        <button
+          class="secondary-button"
+          id="restartButton"
+          type="button"
+        >
+          <span>↻</span>
+          Qayta boshlash
+        </button>
+
+        <button
+          class="primary-button"
+          id="hintButton"
+          type="button"
+        >
+          <span>✦</span>
+          Yordam
+        </button>
+      </div>
+
+      <p class="game-tip">
+        Shaklni bosib ushlab turing va 8×8 maydondagi mos joyga olib boring.
+        Qator yoki ustun to‘lganda tozalanadi.
+      </p>
+    </section>
+
+    <footer class="app-footer">
+      <span>Blocks by Khakimov</span>
+      <span>•</span>
+      <span>8×8 Block Puzzle</span>
+    </footer>
+  </main>
+
+  <!-- Start modal -->
+  <div
+    class="modal-overlay is-hidden"
+    id="startModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="startModalTitle"
+  >
+    <div class="modal-card">
+      <div class="modal-icon">🧩</div>
+
+      <span class="modal-kicker">WELCOME TO</span>
+
+      <h2 class="modal-title" id="startModalTitle">
+        Blocks by Khakimov
+      </h2>
+
+      <p class="modal-description">
+        Rangli bloklarni 8×8 maydonga joylang va imkon qadar ko‘p ball yig‘ing.
+      </p>
+
+      <button
+        class="primary-button modal-button"
+        id="startButton"
+        type="button"
+      >
+        O‘yinni boshlash
+      </button>
+    </div>
+  </div>
+
+  <!-- Pause modal -->
+  <div
+    class="modal-overlay is-hidden"
+    id="pauseModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="pauseModalTitle"
+  >
+    <div class="modal-card">
+      <div class="modal-icon">⏸</div>
+
+      <span class="modal-kicker">PAUSED</span>
+
+      <h2 class="modal-title" id="pauseModalTitle">
+        O‘yin pauzada
+      </h2>
+
+      <p class="modal-description">
+        Davom ettirish uchun quyidagi tugmani bosing.
+      </p>
+
+      <button
+        class="primary-button modal-button"
+        id="resumeButton"
+        type="button"
+      >
+        Davom ettirish
+      </button>
+    </div>
+  </div>
+
+  <!-- Game over modal -->
+  <div
+    class="modal-overlay is-hidden"
+    id="gameOverModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="gameOverTitle"
+  >
+    <div class="modal-card">
+      <div class="modal-icon">✨</div>
+
+      <span class="modal-kicker">GAME OVER</span>
+
+      <h2 class="modal-title" id="gameOverTitle">
+        O‘yin tugadi
+      </h2>
+
+      <div class="result-grid">
+        <div class="result-item">
+          <span>Ball</span>
+          <strong id="finalScoreValue">0</strong>
+        </div>
+
+        <div class="result-item">
+          <span>Rekord</span>
+          <strong id="finalBestValue">0</strong>
+        </div>
+      </div>
+
+      <p
+        class="new-record-message is-hidden"
+        id="newRecordMessage"
+      >
+        🏆 Yangi rekord!
+      </p>
+
+      <button
+        class="primary-button modal-button"
+        id="playAgainButton"
+        type="button"
+      >
+        Qayta o‘ynash
+      </button>
+    </div>
+  </div>
+
+  <!-- Hint modal -->
+  <div
+    class="modal-overlay is-hidden"
+    id="hintModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="hintModalTitle"
+  >
+    <div class="modal-card">
+      <button
+        class="modal-close"
+        id="closeHintButton"
+        type="button"
+        aria-label="Yordam oynasini yopish"
+      >
+        ×
+      </button>
+
+      <div class="modal-icon">💡</div>
+
+      <span class="modal-kicker">HOW TO PLAY</span>
+
+      <h2 class="modal-title" id="hintModalTitle">
+        Qanday o‘ynaladi?
+      </h2>
+
+      <ul class="help-list">
+        <li>
+          <span>1</span>
+          Shaklni bosib ushlab turing.
+        </li>
+
+        <li>
+          <span>2</span>
+          Shaklni 8×8 maydonga olib boring.
+        </li>
+
+        <li>
+          <span>3</span>
+          Mos joy yashil preview bilan ko‘rsatiladi.
+        </li>
+
+        <li>
+          <span>4</span>
+          Qo‘yib yuboring va shakl kataklarga joylashadi.
+        </li>
+
+        <li>
+          <span>5</span>
+          To‘liq qator va ustunlarni tozalang.
+        </li>
+      </ul>
+
+      <button
+        class="primary-button modal-button"
+        id="understandButton"
+        type="button"
+      >
+        Tushundim
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div
+    class="toast"
+    id="toastMessage"
+    role="status"
+    aria-live="polite"
+  >
+    <span id="toastIcon">✓</span>
+    <span id="toastText">Tayyor!</span>
+  </div>
+
+  <!-- Drag clone:
+       JS sudralayotgan shaklning ekrandagi nusxasini shu element ichida ko‘rsatadi -->
+  <div
+    class="drag-clone"
+    id="dragClone"
+    aria-hidden="true"
+  ></div>
+
+  <!-- JavaScript -->
+  <script src="js/app.js" defer></script>
+</body>
+</html>
